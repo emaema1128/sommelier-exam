@@ -1,0 +1,20 @@
+# 開発用のDB。起動: docker compose up -d
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: sommelier
+      POSTGRES_PASSWORD: sommelier
+      POSTGRES_DB: sommelier
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sommelier -d sommelier"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db-data:
