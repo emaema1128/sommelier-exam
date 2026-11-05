@@ -27,6 +27,24 @@ JSAソムリエ/ワインエキスパート試験の対策Webアプリ。一次(
 | `compose.yaml` | 開発用の PostgreSQL |
 | `app/` | 旧 Laravel + Vue 3(Inertia)版。Go版が登録・ログイン・Googleログインまで追いついたら削除する。それまでは参考として残し、新しい機能は足さない |
 
+### server/ の中
+
+| 場所 | 中身 |
+|---|---|
+| `cmd/api` `cmd/import` | 起動用の main。部品を組み立てるだけで、処理は書かない |
+| `internal/domain` | 業務ルール(型・検証・正誤判定)。DB・HTTP を知らない。daichi さんが書く |
+| `internal/usecase` | 処理の流れ。必要な interface(リポジトリなど)はここで定義する |
+| `internal/handler` | HTTP の受け口(JSON の入出力) |
+| `internal/postgres` | DB の読み書き(sqlc の生成コード+usecase の interface の実装) |
+| `db/migrations` `db/queries` | goose のマイグレーション / sqlc に読ませる SQL |
+
+- 依存は一方向: `handler → usecase → domain ← postgres`。`domain` はどこにも依存しない。
+- `utils` `common` のような何でも入る名前のパッケージは作らない。`domain` は大きくなってから `domain/question` のように分ける。
+
+### web/src/ の中
+
+`pages/`(画面。デザインのモック1枚=1ファイル)、`components/`(複数の画面で使う部品)、`api/`(Go の API の呼び出しと型)、`router/`、`styles/tokens.css`(C案の色・文字・角丸)。
+
 技術の方針は `docs/要件定義.md` の「5. アーキテクチャ方針」(v0.5)を参照。このアプリは Go の習得も目的にしているので、サーバーはフレームワークに頼りすぎず標準ライブラリ中心で書く。
 
 ## 開発コマンド
